@@ -107,9 +107,67 @@ function getDatamuseSimilarToUrl(ml) {
  */
 function addToSavedWords(word) {
     // You'll need to finish this...
-    
+    if (!savedWordsArray.includes(word)) {
+        savedWordsArray.push(word);
+        savedWords.innerHTML = savedWordsArray.join(','); 
+    }        
 }
 
 // Add additional functions/callbacks here.
-
+savedWords.innerHTML = '(none)';
+function rhymeCallBack(data) {
+    wordOutput.innerHTML = '';
+    if (data.length === 0) {
+        wordOutput.innerHTML = '(no results)'
+    }
+    else {
+        const groups = groupBy(data, 'numSyllables');
+        for (let group in groups) {
+            const syllable = document.createElement('h3');
+            syllable.textContent = `Syllables: ${group}`;
+            wordOutput.appendChild(syllable);
+            let words =  document.createElement('ul');
+            for (let w in groups[group]) {
+                const item = document.createElement('li');
+                item.textContent = groups[group][w].word;
+                item.innerHTML += `<button type="button" class="btn btn-outline-success" onclick="addToSavedWords('${item.textContent}')">(Save)</button>`;
+                words.appendChild(item);
+            }
+            wordOutput.appendChild(words);
+        }
+    }
+}
+function show_rhymes_trigger() {
+    outputDescription.innerHTML = `Words that rhyme with ${wordInput.value}`;
+    wordOutput.innerHTML = '...loading';
+    datamuseRequest(getDatamuseRhymeUrl(),rhymeCallBack);
+}
+function synonymCallBack(data) {
+    wordOutput.innerHTML = '';
+    if (data.length === 0) {
+        wordOutput.innerHTML = '(no results)'
+    }
+    else {
+        let words =  document.createElement('ul');
+        for (let w in data) {
+            const item = document.createElement('li');
+            item.textContent = data[w].word;
+            item.innerHTML += `<button type="button" class="btn btn-outline-success" onclick="addToSavedWords('${item.textContent}')">(Save)</button>`;
+            words.appendChild(item); 
+        }
+        wordOutput.appendChild(words);
+    }
+}
+function show_synonyms_trigger() {
+    outputDescription.innerHTML = `Words with a meaning similar to ${wordInput.value}`;
+    wordOutput.innerHTML = '...loading';
+    datamuseRequest(getDatamuseSimilarToUrl(),synonymCallBack);
+}
 // Add event listeners here.
+showRhymesButton.addEventListener('click', show_rhymes_trigger);
+wordInput.addEventListener('keyup', (e) => {
+    if (e.keyCode === 13) {
+        show_rhymes_trigger();
+    }
+});
+showSynonymsButton.addEventListener('click', show_synonyms_trigger);
