@@ -109,7 +109,7 @@ function addToSavedWords(word) {
     // You'll need to finish this...
     if (!savedWordsArray.includes(word)) {
         savedWordsArray.push(word);
-        savedWords.innerHTML = savedWordsArray.join(','); 
+        savedWords.innerHTML = savedWordsArray.join(', '); 
     }        
 }
 
